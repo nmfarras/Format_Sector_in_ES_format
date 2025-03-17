@@ -1,4 +1,5 @@
 from geopy import Point
+from matplotlib import pyplot as plt
 import util
 
 ## Data define in this section is based on the characteristic of the boundary
@@ -45,3 +46,37 @@ formatted_output = util.format_coor_points(boundary_points, case_name)
 # Save to file
 with open(f"{case_name}.txt", "w") as f:
     f.write(formatted_output)
+    
+    
+# Extracting longitude and latitude from boundary points
+lons, lats = zip(*boundary_points)
+
+# Save points to a text file
+with open(f"{case_name}_points.txt", "w") as f:
+    f.write("# Longitude, Latitude\n")
+    f.write("# Boundary Points\n")
+    for lon, lat in zip(lons, lats):
+        f.write(f"{lon}, {lat}\n")
+    
+    f.write("\n# ARP Banda Aceh\n")
+    f.write(f"{arp.longitude}, {arp.latitude}\n")
+    
+    f.write("\n# Arc Start\n")
+    f.write(f"{start_point.longitude}, {start_point.latitude}\n")
+    
+    f.write("\n# Arc End\n")
+    f.write(f"{end_point.longitude}, {end_point.latitude}\n")
+
+# Plotting
+plt.figure(figsize=(8, 8))
+plt.plot(lons, lats, marker='o', linestyle='-', label='Boundary')
+plt.scatter(arp.longitude, arp.latitude, color='red', label='ARP Banda Aceh', s=100)
+plt.scatter([start_point.longitude, end_point.longitude], [start_point.latitude, end_point.latitude], color='green', label='Arc Start/End', s=150, edgecolors='black', linewidths=1.5)
+
+# Labels and styling
+plt.xlabel("Longitude")
+plt.ylabel("Latitude")
+plt.title(f"{case_name} Boundary and Arc")
+plt.legend()
+plt.grid()
+plt.show()

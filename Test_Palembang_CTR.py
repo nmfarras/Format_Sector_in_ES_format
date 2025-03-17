@@ -42,7 +42,7 @@ arc_points = util.generate_arc_points(
     bearing_end=util.initial_bearing_angle(arp_sultan_thaha.latitude, arp_sultan_thaha.longitude, arc_end.latitude, arc_end.longitude),
     distance_start_nm=distance_start_nm,
     distance_end_nm=distance_end_nm,
-    step_degrees=10  # Counterclockwise
+    step_degrees=-10  # Counterclockwise
 )
 
 # Convert geopy points to (lon, lat) tuples

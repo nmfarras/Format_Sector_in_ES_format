@@ -89,25 +89,27 @@ def format_arc_points(arc_points, name="Data"):
 
     return "\n".join(lines)
 
-def generate_arc_points(arp, bearing_start, bearing_end, distance_start_nm, distance_end_nm, step_degrees=10):
-    """Generate arc points with approximately one point every 10 degrees, interpolating radius."""
+def generate_arc_points(arp, bearing_start, bearing_end, distance_start_nm, distance_end_nm, step_degrees=5):
+    """Generate points along an arc, determining direction from step_degrees."""
+    # Normalize bearings to [0, 360)
+    bearing_start %= 360
+    bearing_end %= 360
     
+    # Determine direction: positive = CW, negative = CCW
+    if step_degrees > 0:  # Clockwise
+        if bearing_end < bearing_start:
+            bearing_end += 360  # Handle wraparound
+    else:  # Counterclockwise
+        if bearing_end > bearing_start:
+            bearing_start += 360  # Handle wraparound
+        step_degrees = -abs(step_degrees)  # Ensure correct step sign
+    
+    # Generate bearings using np.linspace
+    angles = np.linspace(bearing_start, bearing_end, int(abs(bearing_end - bearing_start) / abs(step_degrees)) + 1) % 360
+
+    # Interpolate radius between start and end distances
     arc_points = []
-    if bearing_start < bearing_end:
-      angles = np.arange(bearing_start + 0.1, bearing_end - 0.1, step_degrees)  # 10° step
-    elif bearing_start > bearing_end:
-      # if step_degrees > 0:
-      #   step_degrees = -step_degrees
-      if step_degrees < 0:
-        step_degrees = -step_degrees
-      angles = np.arange(bearing_end + 0.1, bearing_start - 0.1, step_degrees)  # 10° step
-      angles = angles[::-1]  # Reverse order
-      
-
-    # print(angles)
-
     for i, angle in enumerate(angles):
-        # Interpolate radius between start and end distances
         radius_nm = np.interp(i, [0, len(angles) - 1], [distance_start_nm, distance_end_nm])
         radius_km = radius_nm * 1.852  # Convert NM to KM
 

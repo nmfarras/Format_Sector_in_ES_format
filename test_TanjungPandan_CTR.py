@@ -20,16 +20,10 @@ def dms_to_decimal(dms_str):
     return Point(lat, lon)
 
 # Case Name
-case_name = "Pangkal_Pinang_CTR"
-
-# Fixed Points (Before and After the Arc)
-fixed_points = [
-    dms_to_decimal("004960S 1060000E"),
-    dms_to_decimal("022206S 1075111E"),  # Start of the Arc
-]
+case_name = "Tanjung_Pandan_CTR"
 
 arp_pangkal = dms_to_decimal("024443S 1074511E")  # Arc Center
-arc_start = fixed_points[-1]  # Arc starts from last fixed point
+arc_start = dms_to_decimal("022206S 1075111E")  # Arc starts from last fixed point
 arc_end = dms_to_decimal("024817S 1071525E")  # Arc ends here
 
 # Calculate distances
@@ -37,7 +31,7 @@ distance_start_nm = geodesic(arp_pangkal, arc_start).meters / 1852
 distance_end_nm = geodesic(arp_pangkal, arc_end).meters / 1852
 
 # Generate the Arc in Counterclockwise Order
-arc_points = util.generate_arc_points(
+arc_points_1 = util.generate_arc_points(
     arp=arp_pangkal,
     bearing_start=util.initial_bearing_angle(arp_pangkal.latitude, arp_pangkal.longitude, arc_start.latitude, arc_start.longitude),
     bearing_end=util.initial_bearing_angle(arp_pangkal.latitude, arp_pangkal.longitude, arc_end.latitude, arc_end.longitude),
@@ -47,21 +41,30 @@ arc_points = util.generate_arc_points(
 )
 
 # Convert geopy points to (lon, lat) tuples
-arc_points_tuples = [(point.longitude, point.latitude) for point in arc_points]
+arc_points_tuples_1 = [(point.longitude, point.latitude) for point in arc_points_1]
 
-# Additional fixed points after the arc
-additional_points = [
-    dms_to_decimal("025930S 1060612E"),
-    dms_to_decimal("015404S 1051527E"),
-    dms_to_decimal("004960S 1060000E")  # Closing the polygon
-]
+# Generate the Arc in Clockwise Order
+arc_points_2 = util.generate_arc_points(
+    arp=arp_pangkal,
+    bearing_start=util.initial_bearing_angle(arp_pangkal.latitude, arp_pangkal.longitude, arc_start.latitude, arc_start.longitude),
+    bearing_end=util.initial_bearing_angle(arp_pangkal.latitude, arp_pangkal.longitude, arc_end.latitude, arc_end.longitude),
+    distance_start_nm=distance_start_nm,
+    distance_end_nm=distance_end_nm,
+    step_degrees=5  # Clockwise direction
+)
+
+# Convert geopy points to (lon, lat) tuples
+arc_points_tuples_2 = [(point.longitude, point.latitude) for point in arc_points_2]
 
 # Combine everything into boundary points
 boundary_points = (
-    [(point.longitude, point.latitude) for point in fixed_points] +
-    arc_points_tuples +
-    [(point.longitude, point.latitude) for point in [arc_end, *additional_points]]
+    [(point.longitude, point.latitude) for point in [arc_end]] +
+    arc_points_tuples_1[::-1] +
+    [(point.longitude, point.latitude) for point in [arc_start]]+
+    arc_points_tuples_2 
 )
+
+arc_points_tuples = [*arc_points_tuples_1, *arc_points_tuples_1]
 
 # Create KML
 util.create_kml_polygon(f"{case_name}.kml", boundary_points)
