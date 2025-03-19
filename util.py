@@ -26,7 +26,7 @@ def decimal_to_dms(lat, lon):
 
     return to_dms(lat, True), to_dms(lon, False)
   
-def format_coor_points(boundary_points, name="Data"):
+def format_coor_points(boundary_points, name="Data", Airspace = "C"):
     """Convert boundary points to formatted string with DMS coordinates."""
 
     def decimal_to_dms(lat, lon):
@@ -48,7 +48,7 @@ def format_coor_points(boundary_points, name="Data"):
     first_lat_dms, first_lon_dms = decimal_to_dms(first_lat, first_lon)
     lat2_dms, lon2_dms = decimal_to_dms(second_lat, second_lon)
     (len(name) + 1)
-    lines.append(f"{name}{' ' * (43 - (len(name) + 1))} {first_lat_dms} {first_lon_dms} {lat2_dms} {lon2_dms} COLOR_AirspaceC")
+    lines.append(f"{name}{' ' * (43 - (len(name) + 1))} {first_lat_dms} {first_lon_dms} {lat2_dms} {lon2_dms} COLOR_Airspace{Airspace}")
 
     # Remaining lines
     for i in range(1, len(boundary_points) - 1):
@@ -56,14 +56,14 @@ def format_coor_points(boundary_points, name="Data"):
         lon2, lat2 = boundary_points[i + 1]
         lat1_dms, lon1_dms = decimal_to_dms(lat1, lon1)
         lat2_dms, lon2_dms = decimal_to_dms(lat2, lon2)
-        lines.append(f"{' ' * 43}{lat1_dms} {lon1_dms} {lat2_dms} {lon2_dms} COLOR_AirspaceC")
+        lines.append(f"{' ' * 43}{lat1_dms} {lon1_dms} {lat2_dms} {lon2_dms} COLOR_Airspace{Airspace}")
 
     # Closing the polygon if necessary
     if len(boundary_points) > 2:
         last_lon, last_lat = boundary_points[-1]
         if boundary_points[-1] != boundary_points[0]:
           lat_last_dms, lon_last_dms = decimal_to_dms(last_lat, last_lon)
-          lines.append(f"{' ' * 43}{lat_last_dms} {lon_last_dms} {first_lat_dms} {first_lon_dms} COLOR_AirspaceC")
+          lines.append(f"{' ' * 43}{lat_last_dms} {lon_last_dms} {first_lat_dms} {first_lon_dms} COLOR_Airspace{Airspace}")
 
     return "\n".join(lines)
 
