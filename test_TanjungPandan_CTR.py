@@ -23,7 +23,7 @@ def dms_to_decimal(dms_str):
 case_name = "Tanjung_Pandan_CTR"
 
 arp_pangkal = dms_to_decimal("024443S 1074511E")  # Arc Center
-arc_start = dms_to_decimal("022206S 1075111E")  # Arc starts from last fixed point
+arc_start = dms_to_decimal("022206S 1072522E")  # Arc starts from last fixed point
 arc_end = dms_to_decimal("024817S 1071525E")  # Arc ends here
 
 # Calculate distances
@@ -35,8 +35,8 @@ arc_points_1 = util.generate_arc_points(
     arp=arp_pangkal,
     bearing_start=util.initial_bearing_angle(arp_pangkal.latitude, arp_pangkal.longitude, arc_start.latitude, arc_start.longitude),
     bearing_end=util.initial_bearing_angle(arp_pangkal.latitude, arp_pangkal.longitude, arc_end.latitude, arc_end.longitude),
-    distance_start_nm=distance_start_nm,
-    distance_end_nm=distance_end_nm,
+    distance_start_nm=30,
+    distance_end_nm=30,
     step_degrees=-5  # Counterclockwise direction
 )
 
@@ -48,8 +48,8 @@ arc_points_2 = util.generate_arc_points(
     arp=arp_pangkal,
     bearing_start=util.initial_bearing_angle(arp_pangkal.latitude, arp_pangkal.longitude, arc_start.latitude, arc_start.longitude),
     bearing_end=util.initial_bearing_angle(arp_pangkal.latitude, arp_pangkal.longitude, arc_end.latitude, arc_end.longitude),
-    distance_start_nm=distance_start_nm,
-    distance_end_nm=distance_end_nm,
+    distance_start_nm=30,
+    distance_end_nm=30,
     step_degrees=5  # Clockwise direction
 )
 

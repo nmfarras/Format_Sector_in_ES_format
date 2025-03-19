@@ -1,10 +1,9 @@
 from geopy import Point
 from geopy.distance import geodesic
-import util
 import re
+import util
 import matplotlib.pyplot as plt
 
-# Convert DMS to Decimal Degrees
 def dms_to_decimal(dms_str):
     """Convert DMS (Degrees Minutes Seconds) format to decimal degrees."""
     match = re.match(r"(\d{2})(\d{2})(\d{2})([NS])\s*(\d{3})(\d{2})(\d{2})([EW])", dms_str)
@@ -20,48 +19,36 @@ def dms_to_decimal(dms_str):
     return Point(lat, lon)
 
 # Case Name
-case_name = "Pangkal_Pinang_CTR"
+case_name = "Halim_Perdanakusuma_ATZ"
 
 # Fixed Points (Before and After the Arc)
 fixed_points = [
-    dms_to_decimal("004960S 1060000E"),
-    dms_to_decimal("022206S 1072522E"),  # Start of the Arc
+    dms_to_decimal("061858S 1064125E"),
+    dms_to_decimal("060400S 1065207E")  # Start of the Arc
 ]
 
-arp_pangkal = dms_to_decimal("024443S 1074511E")  # Arc Center
+# Arc Center
+arc_center = dms_to_decimal("061558S 1065303E")
 arc_start = fixed_points[-1]  # Arc starts from last fixed point
-arc_end = dms_to_decimal("024817S 1071525E")  # Arc ends here
+arc_end = fixed_points[0]  # Arc ends back at first point
 
-# Calculate distances
-distance_start_nm = geodesic(arp_pangkal, arc_start).meters / 1852
-distance_end_nm = geodesic(arp_pangkal, arc_end).meters / 1852
-
-# Generate the Arc in Counterclockwise Order
+# Generate the Arc in Clockwise Order
 arc_points = util.generate_arc_points(
-    arp=arp_pangkal,
-    bearing_start=util.initial_bearing_angle(arp_pangkal.latitude, arp_pangkal.longitude, arc_start.latitude, arc_start.longitude),
-    bearing_end=util.initial_bearing_angle(arp_pangkal.latitude, arp_pangkal.longitude, arc_end.latitude, arc_end.longitude),
-    distance_start_nm=30,
-    distance_end_nm=30,
-    step_degrees=-5  # Counterclockwise direction
+    arp=arc_center,
+    bearing_start=util.initial_bearing_angle(arc_center.latitude, arc_center.longitude, arc_start.latitude, arc_start.longitude),
+    bearing_end=util.initial_bearing_angle(arc_center.latitude, arc_center.longitude, arc_end.latitude, arc_end.longitude),
+    distance_start_nm=12,
+    distance_end_nm=12,
+    step_degrees=2  # Clockwise direction
 )
 
 # Convert geopy points to (lon, lat) tuples
 arc_points_tuples = [(point.longitude, point.latitude) for point in arc_points]
 
-# Additional fixed points after the arc
-additional_points = [
-    dms_to_decimal("025930S 1060612E"),
-    dms_to_decimal("020151S 1052129E"),
-    dms_to_decimal("015404S 1051527E"),
-    dms_to_decimal("004960S 1060000E")  # Closing the polygon
-]
-
 # Combine everything into boundary points
 boundary_points = (
     [(point.longitude, point.latitude) for point in fixed_points] +
-    arc_points_tuples +
-    [(point.longitude, point.latitude) for point in [arc_end, *additional_points]]
+    arc_points_tuples
 )
 
 # Create KML
@@ -74,28 +61,14 @@ print(formatted_output)
 with open(f"{case_name}.txt", "w") as f:
     f.write(formatted_output)
 
-# Debugging Info
-print(f"{case_name} Bearings:")
-print(f"  Bearing Start: {util.initial_bearing_angle(arp_pangkal.latitude, arp_pangkal.longitude, arc_start.latitude, arc_start.longitude)}")
-print(f"  Bearing End: {util.initial_bearing_angle(arp_pangkal.latitude, arp_pangkal.longitude, arc_end.latitude, arc_end.longitude)}")
-
-print(f"{case_name} Distances:")
-print(f"  Distance Start (NM): {distance_start_nm}")
-print(f"  Distance End (NM): {distance_end_nm}")
-
-print(f"{case_name} Arc Points (Lon, Lat):")
-for pt in arc_points_tuples:
-    print(f"  {pt}")
-
 # Visualization
 lons, lats = zip(*boundary_points)
 
 plt.figure(figsize=(8, 8))
 plt.plot(lons, lats, marker='o', linestyle='-', label='Boundary')
-plt.scatter(arp_pangkal.longitude, arp_pangkal.latitude, color='red', label='ARP Pangkal Pinang', s=100)
+plt.scatter(arc_center.longitude, arc_center.latitude, color='red', label='Arc Center', s=100)
 plt.scatter([arc_start.longitude, arc_end.longitude], [arc_start.latitude, arc_end.latitude], color='green', label='Arc Start/End', s=150, edgecolors='black', linewidths=1.5)
 plt.scatter(fixed_points[0].longitude, fixed_points[0].latitude, color='yellow', label='StartPoint', s=150, edgecolors='black', linewidths=1.5)
-
 plt.xlabel("Longitude")
 plt.ylabel("Latitude")
 plt.title(f"{case_name} Boundary and Arc")

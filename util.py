@@ -90,32 +90,43 @@ def format_arc_points(arc_points, name="Data"):
     return "\n".join(lines)
 
 def generate_arc_points(arp, bearing_start, bearing_end, distance_start_nm, distance_end_nm, step_degrees=5):
-    """Generate points along an arc, determining direction from step_degrees."""
-    # Normalize bearings to [0, 360)
+    """Generate points along an arc, ensuring the last point is exactly arc_end."""
+    # Adjust bearings based on direction
+    clockwise = step_degrees > 0
+    
+    stop_space = 10 ** max(0, math.floor(math.log10(abs(step_degrees))))
+    
+    if clockwise:
+        bearing_start += stop_space
+        bearing_end -= stop_space
+    else:
+        bearing_start -= stop_space
+        bearing_end += stop_space
+    
     bearing_start %= 360
     bearing_end %= 360
-    
-    # Determine direction: positive = CW, negative = CCW
-    if step_degrees > 0:  # Clockwise
-        if bearing_end < bearing_start:
-            bearing_end += 360  # Handle wraparound
-    else:  # Counterclockwise
-        if bearing_end > bearing_start:
-            bearing_start += 360  # Handle wraparound
-        step_degrees = -abs(step_degrees)  # Ensure correct step sign
-    
+
+    # Handle wrap-around angles
+    if clockwise and bearing_end < bearing_start:
+        bearing_end += 360
+    elif not clockwise and bearing_start < bearing_end:
+        bearing_start += 360
+
     # Generate bearings using np.linspace
-    angles = np.linspace(bearing_start, bearing_end, int(abs(bearing_end - bearing_start) / abs(step_degrees)) + 1) % 360
+    angles = np.linspace(bearing_start, bearing_end, int(abs(bearing_end - bearing_start) / abs(step_degrees))) % 360
+    
+    print(angles)
 
     # Interpolate radius between start and end distances
     arc_points = []
-    for i, angle in enumerate(angles):
+    for i, angle in enumerate(angles[:-1]):  # Exclude the last auto-generated point
         radius_nm = np.interp(i, [0, len(angles) - 1], [distance_start_nm, distance_end_nm])
         radius_km = radius_nm * 1.852  # Convert NM to KM
-
-        # Compute the geodesic destination
         point = geodesic(kilometers=radius_km).destination(arp, angle)
         arc_points.append(point)
+
+    # Ensure last point is exactly arc_end
+    arc_points.append(geodesic(kilometers=distance_end_nm * 1.852).destination(arp, bearing_end % 360))
 
     return arc_points
 
