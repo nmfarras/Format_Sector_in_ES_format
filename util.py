@@ -93,6 +93,10 @@ def generate_arc_points(arp, bearing_start, bearing_end, distance_start_nm, dist
     """Generate points along an arc, ensuring the last point is exactly arc_end."""
     # Adjust bearings based on direction
     clockwise = step_degrees > 0
+    is_circle = False
+    
+    if bearing_start == bearing_end or (bearing_start == 0 and bearing_end == 360) or (bearing_start == 360 and bearing_end == 0):
+        is_circle = True
     
     stop_space = 10 ** max(0, math.floor(math.log10(abs(step_degrees))))
     
@@ -115,6 +119,11 @@ def generate_arc_points(arp, bearing_start, bearing_end, distance_start_nm, dist
     # Generate bearings using np.linspace
     angles = np.linspace(bearing_start, bearing_end, int(abs(bearing_end - bearing_start) / abs(step_degrees))) % 360
     
+    print(is_circle)
+    
+    if is_circle:
+        angles = np.append(angles,360)
+    
     print(angles)
 
     # Interpolate radius between start and end distances
@@ -125,8 +134,12 @@ def generate_arc_points(arp, bearing_start, bearing_end, distance_start_nm, dist
         point = geodesic(kilometers=radius_km).destination(arp, angle)
         arc_points.append(point)
 
-    # Ensure last point is exactly arc_end
-    arc_points.append(geodesic(kilometers=distance_end_nm * 1.852).destination(arp, bearing_end % 360))
+    if is_circle:
+        arc_points.append(geodesic(kilometers=distance_end_nm * 1.852).destination(arp, 360))
+        arc_points.append(arc_points[0])
+    else:
+        # Ensure last point is exactly arc_end
+        arc_points.append(geodesic(kilometers=distance_end_nm * 1.852).destination(arp, bearing_end % 360))
 
     return arc_points
 
