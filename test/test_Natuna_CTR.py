@@ -4,19 +4,19 @@ import util
 import matplotlib.pyplot as plt
 import re
 
-def dms_to_decimal(dms_str):
-    """Convert DMS (Degrees, Minutes, Seconds) to decimal degrees."""
-    match = re.match(r"(\d{2})(\d{2})(\d{2})([NS])\s*(\d{3})(\d{2})(\d{2})([EW])", dms_str)
-    if not match:
-        raise ValueError(f"Invalid DMS format: {dms_str}")
+# def dms_to_decimal(dms_str):
+#     """Convert DMS (Degrees, Minutes, Seconds) to decimal degrees."""
+#     match = re.match(r"(\d{2})(\d{2})(\d{2})([NS])\s*(\d{3})(\d{2})(\d{2})([EW])", dms_str)
+#     if not match:
+#         raise ValueError(f"Invalid DMS format: {dms_str}")
 
-    lat_sign = -1 if match.group(4) == 'S' else 1
-    lat = lat_sign * (int(match.group(1)) + int(match.group(2)) / 60 + int(match.group(3)) / 3600)
+#     lat_sign = -1 if match.group(4) == 'S' else 1
+#     lat = lat_sign * (int(match.group(1)) + int(match.group(2)) / 60 + int(match.group(3)) / 3600)
 
-    lon_sign = -1 if match.group(8) == 'W' else 1
-    lon = lon_sign * (int(match.group(5)) + int(match.group(6)) / 60 + int(match.group(7)) / 3600)
+#     lon_sign = -1 if match.group(8) == 'W' else 1
+#     lon = lon_sign * (int(match.group(5)) + int(match.group(6)) / 60 + int(match.group(7)) / 3600)
 
-    return Point(lat, lon)
+#     return Point(lat, lon)
 
 """
 Natuna CTR :
@@ -29,11 +29,11 @@ Ranai ARP
 case_name = "Natuna_CTR"
 
 # Define fixed boundary points
-point_start = dms_to_decimal("042303N 1083230E")
-point_end = dms_to_decimal("034336N 1085119E")
+point_start = util.dms_to_decimal("042303N 1083230E")
+point_end = util.dms_to_decimal("034336N 1085119E")
 
 # Define arc center and radius
-arp_natuna = dms_to_decimal("035422N 1082317E")  # Ranai ARP
+arp_natuna = util.dms_to_decimal("035422N 1082317E")  # Ranai ARP
 arc_radius_nm = 30  # Convert to KM
 arc_radius_km = arc_radius_nm * 1.852  
 

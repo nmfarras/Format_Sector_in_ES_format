@@ -19,31 +19,32 @@ def dms_to_decimal(dms_str):
     return Point(lat, lon)
 
 """
-Natuna CTR :
-042303N 1083230E - 034336N 1085119E thence clockwise along the circle of 30NM radius centered at ARP to 042303N 1083230E
+JAYAPURA CTR :
+020650S 1410000E - 030341S 1410000E thence clockwise along the arc of a circle radius 40 NM centered at ARP Sentani Aerodrome to 020650S 1410000E
 
-Ranai ARP
-035422N 1082317E
+Sentani ARP:
+023419S 1403042E
 """
 
-case_name = "Natuna_CTR"
+case_name = "Jayapura_CTR"
 
 # Define fixed boundary points
-point_start = dms_to_decimal("042303N 1083230E")
-point_end = dms_to_decimal("034336N 1085119E")
+point_start = dms_to_decimal("020650S 1410000E")
+# point_end = dms_to_decimal("030341S 1410000E")
+point_end = dms_to_decimal("030200S 1410000E")
 
 # Define arc center and radius
-arp_natuna = dms_to_decimal("035422N 1082317E")  # Ranai ARP
-arc_radius_nm = 30  # Convert to KM
+arp_sentani = dms_to_decimal("023419S 1403042E")  # Sentani Aerodrome ARP
+arc_radius_nm = 40  # Convert to KM
 arc_radius_km = arc_radius_nm * 1.852  
 
 # Compute bearing angles
-bearing_start = util.initial_bearing_angle(arp_natuna.latitude, arp_natuna.longitude, point_end.latitude, point_end.longitude)
-bearing_end = util.initial_bearing_angle(arp_natuna.latitude, arp_natuna.longitude, point_start.latitude, point_start.longitude)
+bearing_start = util.initial_bearing_angle(arp_sentani.latitude, arp_sentani.longitude, point_end.latitude, point_end.longitude)
+bearing_end = util.initial_bearing_angle(arp_sentani.latitude, arp_sentani.longitude, point_start.latitude, point_start.longitude)
 
 # Generate arc points
 arc_points = util.generate_arc_points(
-    arp=arp_natuna,
+    arp=arp_sentani,
     bearing_start=bearing_start,
     bearing_end=bearing_end,
     distance_start_nm=arc_radius_nm,
@@ -72,8 +73,8 @@ with open(f"{case_name}.txt", "w") as f:
 lons, lats = zip(*boundary_points)
 
 plt.figure(figsize=(8, 8))
-plt.plot(lons, lats, marker='o', linestyle='-', label='Natuna CTR')
-plt.scatter(arp_natuna.longitude, arp_natuna.latitude, color='red', label='ARP Natuna', s=100)
+plt.plot(lons, lats, marker='o', linestyle='-', label='Jayapura CTR')
+plt.scatter(arp_sentani.longitude, arp_sentani.latitude, color='red', label='ARP Sentani', s=100)
 plt.scatter(point_start.longitude, point_start.latitude, color='yellow', label='StartPoint', s=450, edgecolors='black', linewidths=1.5)
 plt.scatter([point_start.longitude, point_end.longitude], [point_start.latitude, point_end.latitude], color='green', label='Start/End Points', s=150, edgecolors='black', linewidths=1.5)
 

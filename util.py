@@ -1,3 +1,4 @@
+import re
 from geopy.distance import geodesic
 import numpy as np
 import math
@@ -15,6 +16,20 @@ def initial_bearing_angle(lat1, lon1, lat2, lon2):
     bearing = math.degrees(bearing)
     return (bearing + 360) % 360  # Normalize to 0-360 degrees
 
+def dms_to_decimal(dms_str):
+    """Convert DMS (Degrees, Minutes, Seconds) or DMS with decimal seconds to decimal degrees."""
+    match = re.match(r"(\d{2})(\d{2})(\d{2}(?:\.\d*)?)([NS])\s*(\d{3})(\d{2})(\d{2}(?:\.\d*)?)([EW])", dms_str)
+    if not match:
+        raise ValueError(f"Invalid DMS format: {dms_str}")
+
+    lat_sign = -1 if match.group(4) == 'S' else 1
+    lat = lat_sign * (int(match.group(1)) + int(match.group(2)) / 60 + float(match.group(3)) / 3600)
+
+    lon_sign = -1 if match.group(8) == 'W' else 1
+    lon = lon_sign * (int(match.group(5)) + int(match.group(6)) / 60 + float(match.group(7)) / 3600)
+
+    return Point(lat, lon)
+
 def decimal_to_dms(lat, lon):
     """Convert decimal degrees to DMS format"""
     def to_dms(value, is_lat=True):
@@ -28,17 +43,6 @@ def decimal_to_dms(lat, lon):
   
 def format_coor_points(boundary_points, name="Data", Airspace = "C"):
     """Convert boundary points to formatted string with DMS coordinates."""
-
-    def decimal_to_dms(lat, lon):
-        """Convert decimal degrees to DMS format."""
-        def to_dms(value, is_lat=True):
-            degrees = int(abs(value))
-            minutes = int((abs(value) - degrees) * 60)
-            seconds = (abs(value) - degrees - minutes / 60) * 3600
-            direction = ('N' if value >= 0 else 'S') if is_lat else ('E' if value >= 0 else 'W')
-            return f"{direction}{degrees:03d}.{minutes:02d}.{seconds:06.3f}"
-
-        return to_dms(lat, True), to_dms(lon, False)
 
     lines = []
 

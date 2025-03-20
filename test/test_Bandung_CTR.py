@@ -5,18 +5,18 @@ import re
 import matplotlib.pyplot as plt
 import math
 
-def dms_to_decimal(dms_str):
-    match = re.match(r"(\d{2})(\d{2})(\d{2})([NS])\s*(\d{3})(\d{2})(\d{2})([EW])", dms_str)
-    if not match:
-        raise ValueError(f"Invalid DMS format: {dms_str}")
+# def dms_to_decimal(dms_str):
+#     match = re.match(r"(\d{2})(\d{2})(\d{2})([NS])\s*(\d{3})(\d{2})(\d{2})([EW])", dms_str)
+#     if not match:
+#         raise ValueError(f"Invalid DMS format: {dms_str}")
 
-    lat_sign = -1 if match.group(4) == 'S' else 1
-    lat = lat_sign * (int(match.group(1)) + int(match.group(2)) / 60 + int(match.group(3)) / 3600)
+#     lat_sign = -1 if match.group(4) == 'S' else 1
+#     lat = lat_sign * (int(match.group(1)) + int(match.group(2)) / 60 + int(match.group(3)) / 3600)
 
-    lon_sign = -1 if match.group(8) == 'W' else 1
-    lon = lon_sign * (int(match.group(5)) + int(match.group(6)) / 60 + int(match.group(7)) / 3600)
+#     lon_sign = -1 if match.group(8) == 'W' else 1
+#     lon = lon_sign * (int(match.group(5)) + int(match.group(6)) / 60 + int(match.group(7)) / 3600)
 
-    return Point(lat, lon)
+#     return Point(lat, lon)
 
 """
 Prompt
@@ -29,18 +29,18 @@ case_name = "Bandung_CTR"
 
 # Define fixed points
 fixed_points = [
-    dms_to_decimal("064716S 1074346E"),
-    dms_to_decimal("064716S 1065700E"),
-    dms_to_decimal("074960S 1065700E"),
-    dms_to_decimal("074960S 1082933E"),
-    dms_to_decimal("072418S 1084814E"),
-    dms_to_decimal("063832S 1074833E")
+    util.dms_to_decimal("064716S 1074346E"),
+    util.dms_to_decimal("064716S 1065700E"),
+    util.dms_to_decimal("074960S 1065700E"),
+    util.dms_to_decimal("074960S 1082933E"),
+    util.dms_to_decimal("072418S 1084814E"),
+    util.dms_to_decimal("063832S 1074833E")
 ]
 
 # Arc center and start/end points
-arp_bandung = dms_to_decimal("060700S 1064030E")  # Arc center
-arc_start = dms_to_decimal("064716S 1074346E")
-arc_end = dms_to_decimal("063832S 1074833E")
+arp_bandung = util.dms_to_decimal("060700S 1064030E")  # Arc center
+arc_start = util.dms_to_decimal("064716S 1074346E")
+arc_end = util.dms_to_decimal("063832S 1074833E")
 
 # Arc radius (approximate)
 distance_nm = geodesic((arp_bandung.latitude, arp_bandung.longitude), (arc_start.latitude, arc_start.longitude)).nautical
