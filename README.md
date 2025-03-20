@@ -1,1 +1,1 @@
-Based on AIRAC Document. Use the pattern in the tes_ file based on the dictation from the AIRAC.
+Based on AIRAC Document. Use the pattern in the tes* file based on the dictation from the AIRAC. You can try one of the file name "test*[something].py" to check the pattern and how to use util.py for generation based on dictation.
